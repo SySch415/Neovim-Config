@@ -1,11 +1,9 @@
--- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
 	local lazyrepo = "https://github.com/folke/lazy.nvim.git"
 	local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
 
-	-- check if cloning is successfull
 	if vim.v.shell_error ~= 0 then
 		vim.api.nvim_echo({
 			{ "Failed to clone lazy.nvim:\n", "ErrorMsg" },
@@ -18,16 +16,13 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- Make sure to setup `mapleader` and `maplocalleader` before
--- loading lazy.nvim so that mappings are correct.
--- This is also a good place to setup other settings (vim.opt)
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
--- Setup lazy.nvim
+-- Setup
 require("lazy").setup({
 	spec = {
-		-- add your plugins here
+
 		{ "LazyVim/LazyVim", import = "lazyvim.plugins" },
 
 		{ import = "lazyvim.plugins.extras.lang.typescript" },
@@ -80,7 +75,7 @@ require("lazy").setup({
 			end,
 		},
 
-		-- Rust LSP and development
+		-- LSP for rust, cpp, python.
 		{
 			"neovim/nvim-lspconfig",
 			dependencies = { "mason-org/mason.nvim", "mason-org/mason-lspconfig.nvim" },
@@ -107,7 +102,6 @@ require("lazy").setup({
 					},
 				})
 
-				-- C/C++ LSP
 				local mason_clangd = "/home/sy/.local/share/nvim/mason/bin/clangd"
 				lspconfig.clangd.setup({
 					cmd = { mason_clangd },
@@ -117,7 +111,7 @@ require("lazy").setup({
 			end,
 		},
 
-		-- Rust syntax highlighting and better parsing
+		-- treesitter
 		{
 			"nvim-treesitter/nvim-treesitter",
 			opts = {
@@ -159,7 +153,7 @@ require("lazy").setup({
 			},
 		},
 
-		-- Autocompletion for Rust
+		-- Autocompletion for rust?
 		{
 			"hrsh7th/nvim-cmp",
 			dependencies = {
@@ -218,7 +212,7 @@ require("lazy").setup({
 			end,
 		},
 
-		-- Debugging Support with LLDB
+		-- Debugging Support update with codelldb now
 		{
 			"mfussenegger/nvim-dap",
 			config = function()
@@ -264,7 +258,7 @@ require("lazy").setup({
 			end,
 		},
 
-		-- UI for nvim-dap
+		-- nvim-dap
 		{
 			"rcarriga/nvim-dap-ui",
 			dependencies = {
@@ -276,7 +270,7 @@ require("lazy").setup({
 			end,
 		},
 
-		-- path completition/intellisense
+		-- intellisense
 		{
 			"hrsh7th/nvim-cmp",
 			dependencies = {
@@ -285,10 +279,8 @@ require("lazy").setup({
 				"hrsh7th/cmp-nvim-lsp",
 				"saadparwaiz1/cmp_luasnip",
 
-				-- Snippet completition
 				"L3MON4D3/LuaSnip",
 
-				-- Snippet Engine
 				"rafamadriz/friendly-snippets",
 			},
 			config = function()
@@ -351,23 +343,23 @@ require("lazy").setup({
 			end,
 		},
 
-		-- git integration
 		{ "tpope/vim-fugitive" },
 
 		-- status line
 		{ "nvim-lualine/lualine.nvim" },
 
-		-- Javascript/react development
+		-- JS  stuff, don't use anymore
 		{ "pangloss/vim-javascript" },
 		{ "maxmellon/vim-jsx-pretty" },
 	},
-	-- Configure any other settings here. See the documentation for more details.
-	-- colorscheme that will be used when installing plugins.
+
 	install = { colorscheme = { "kanagawa" } },
-	-- automatically check for plugin updates
+
+	-- update checker
 	checker = { enabled = true },
 })
 
+-- for num bar and cursor
 vim.cmd([[
 highlight LineNr guifg=#FFF36D guibg=NONE
 highlight CursorLineNr guifg=#FF0000 guibg=NONE
