@@ -332,14 +332,16 @@ require("lazy").setup({
 		},
 
 		{
-			"rebelot/kanagawa.nvim",
+			"ellisonleao/gruvbox.nvim",
 			lazy = false,
 			priority = 1000,
 			config = function()
-				require("kanagawa").setup({
-					transparent = true,
+				require("gruvbox").setup({
+					contrast = "hard",
+					transparent_mode = false,
 				})
-				vim.cmd.colorscheme("kanagawa-dragon")
+				vim.cmd.colorscheme("gruvbox")
+				vim.api.nvim_set_hl(0, "Normal", { fg = "#ffffff", bg = nil })
 			end,
 		},
 
@@ -353,7 +355,7 @@ require("lazy").setup({
 		{ "maxmellon/vim-jsx-pretty" },
 	},
 
-	install = { colorscheme = { "kanagawa" } },
+	install = { colorscheme = { "gruvbox" } },
 
 	-- update checker
 	checker = { enabled = true },
@@ -370,3 +372,4 @@ highlight SignColumn guibg=NONE
 
 vim.opt.relativenumber = false
 vim.opt.number = true
+vim.opt.termguicolors = true
