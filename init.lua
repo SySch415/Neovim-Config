@@ -64,14 +64,14 @@ require("lazy").setup({
 			"dense-analysis/ale",
 			config = function()
 				vim.g.ale_linters = {
-					cpp = { "g++", "clang", "cppcheck" },
+					--cpp = { "g++", "clang", "cppcheck" },
 					java = { "javac" },
 				}
 				vim.g.ale_fixers = {
-					cpp = { "clang-format" },
+					--cpp = { "clang-format" },
 					java = { "google-java-format" },
 				}
-				vim.g.ale_cpp_gcc_options = "-std=c++17"
+				--vim.g.ale_cpp_gcc_options = "-std=c++17"
 			end,
 		},
 
@@ -133,7 +133,7 @@ require("lazy").setup({
 						args = {
 							"--enable=all",
 							"--inline-suppr",
-							"--std=c11",
+							"--std=c++17",
 							"--cppcheck-build-dir=/tmp/cppcheck",
 						},
 					},
@@ -339,6 +339,10 @@ require("lazy").setup({
 				require("gruvbox").setup({
 					contrast = "hard",
 					transparent_mode = false,
+					palette_overrides = {
+						--bright_green = "#35c44b",
+						neutral_green = "#27ae60",
+					},
 				})
 				vim.cmd.colorscheme("gruvbox")
 				vim.api.nvim_set_hl(0, "Normal", { fg = "#ffffff", bg = nil })
