@@ -64,14 +64,16 @@ require("lazy").setup({
 			"dense-analysis/ale",
 			config = function()
 				vim.g.ale_linters = {
-					--cpp = { "g++", "clang", "cppcheck" },
+					cpp = { --[["g++", "clang",]]
+						"cppcheck",
+					},
 					java = { "javac" },
 				}
 				vim.g.ale_fixers = {
-					--cpp = { "clang-format" },
+					cpp = { "clang-format" },
 					java = { "google-java-format" },
 				}
-				--vim.g.ale_cpp_gcc_options = "-std=c++17"
+				vim.g.ale_cpp_gcc_options = "-std=c++17"
 			end,
 		},
 
