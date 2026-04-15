@@ -64,7 +64,8 @@ require("lazy").setup({
 			"dense-analysis/ale",
 			config = function()
 				vim.g.ale_linters = {
-					cpp = { --[["g++", "clang",]]
+					cpp = {
+						"g++",--[["g++", "clang",]]
 						"cppcheck",
 					},
 					java = { "javac" },
