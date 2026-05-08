@@ -74,7 +74,7 @@ require("lazy").setup({
 					cpp = { "clang-format" },
 					java = { "google-java-format" },
 				}
-				vim.g.ale_cpp_gcc_options = "-std=c++17"
+				vim.g.ale_cpp_cc_options = "-std=c++17"
 			end,
 		},
 
