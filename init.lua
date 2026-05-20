@@ -65,7 +65,7 @@ require("lazy").setup({
 			config = function()
 				vim.g.ale_linters = {
 					cpp = {
-						"g++",--[["g++", "clang",]]
+						--[["g++", "clang",]]
 						"cppcheck",
 					},
 					java = { "javac" },
@@ -85,7 +85,9 @@ require("lazy").setup({
 			config = function()
 				require("mason").setup()
 				require("mason-lspconfig").setup({
-					ensure_installed = { "rust_analyzer", "clangd" },
+					ensure_installed = {
+						"rust_analyzer", --[["clangd"]]
+					},
 					automatic_enable = true,
 				})
 
@@ -105,9 +107,8 @@ require("lazy").setup({
 					},
 				})
 
-				local mason_clangd = "/home/sy/.local/share/nvim/mason/bin/clangd"
 				lspconfig.clangd.setup({
-					cmd = { mason_clangd },
+					cmd = { "clangd", "--query-driver=/usr/bin/arm-none-eabi-g++" },
 					filetypes = { "c", "cpp", "objc", "objcpp" },
 					root_dir = lspconfig.util.root_pattern("compile_commands.json", "compile_flags.txt", ".git"),
 				})
