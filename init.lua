@@ -66,7 +66,7 @@ require("lazy").setup({
 				vim.g.ale_linters = {
 					cpp = {
 						--[["g++", "clang",]]
-						"cppcheck",
+						--"cppcheck",
 					},
 					java = { "javac" },
 				}
