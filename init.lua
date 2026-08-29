@@ -69,6 +69,8 @@ require("lazy").setup({
 						--"cppcheck",
 					},
 					java = { "javac" },
+					asm = {},
+					s = {},
 				}
 				vim.g.ale_fixers = {
 					cpp = { "clang-format" },
