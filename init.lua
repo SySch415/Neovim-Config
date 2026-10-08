@@ -65,6 +65,7 @@ require("lazy").setup({
 		{
 			"dense-analysis/ale",
 			config = function()
+				vim.g.ale_linters_explicit = 1
 				vim.g.ale_linters = {
 					cpp = {
 						--[["g++", "clang",]]
@@ -134,7 +135,7 @@ require("lazy").setup({
 					rust = { "clippy" },
 					cpp = { "cppcheck" },
 					c = { "cppcheck" },
-					python = { "flake8" },
+					python = { "ruff" },
 				},
 				linters = {
 					cppcheck = {
@@ -156,7 +157,7 @@ require("lazy").setup({
 					rust = { "rustfmt" },
 					cpp = { "clang_format" },
 					c = { "clang_format" },
-					python = { "black" },
+					python = { "ruff_fix", "ruff_format" },
 				},
 			},
 		},
@@ -385,3 +386,5 @@ highlight SignColumn guibg=NONE
 vim.opt.relativenumber = false
 vim.opt.number = true
 vim.opt.termguicolors = true
+
+vim.diagnostic.config({ virtual_text = true, severity_sort = true })
