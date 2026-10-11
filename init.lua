@@ -224,8 +224,77 @@ require("lazy").setup({
 		-- Debugging Support update with codelldb now
 		{
 			"mfussenegger/nvim-dap",
+			dependencies = {
+				"jedrzejboczar/nvim-dap-cortex-debug",
+			},
+			keys = {
+				{
+					"<leader>db",
+					function()
+						require("dap").toggle_breakpoint()
+					end,
+					desc = "DAP Toggle Breakpoint",
+				},
+				{
+					"<leader>dc",
+					function()
+						require("dap").continue()
+					end,
+					desc = "DAP Continue / Start Session",
+				},
+				{
+					"<leader>di",
+					function()
+						require("dap").step_into()
+					end,
+					desc = "DAP Step Into",
+				},
+				{
+					"<leader>do",
+					function()
+						require("dap").step_over()
+					end,
+					desc = "DAP Step Over",
+				},
+				{
+					"<leader>dt",
+					function()
+						require("dap").terminate()
+					end,
+					desc = "DAP Terminate Session",
+				},
+				{
+					"<leader>du",
+					function()
+						require("dapui").toggle()
+					end,
+					desc = "DAP Toggle UI Manually",
+				},
+			},
 			config = function()
 				local dap = require("dap")
+				local dapui = require("dapui")
+
+				-- gdb-style REPL shortcuts; these go through DAP so the UI stays in sync
+				local repl_cmds = require("dap.repl").commands
+				vim.list_extend(repl_cmds.next_, { "n", "next" })
+				vim.list_extend(repl_cmds.into, { "s", "step" })
+				vim.list_extend(repl_cmds.out, { "finish" })
+				vim.list_extend(repl_cmds.continue, { "c", "continue" })
+				vim.list_extend(repl_cmds.nexti, { "ni" })
+				vim.list_extend(repl_cmds.intoi, { "si" })
+				dap.listeners.before["attach"]["dapui_config"] = function()
+					dapui.open()
+				end
+				dap.listeners.before["launch"]["dapui_config"] = function()
+					dapui.open()
+				end
+				dap.listeners.before["event_terminated"]["dapui_config"] = function()
+					dapui.close()
+				end
+				dap.listeners.before["event_exited"]["dapui_config"] = function()
+					dapui.close()
+				end
 				dap.adapters.codelldb = {
 					type = "server",
 					port = "${port}",
@@ -264,6 +333,51 @@ require("lazy").setup({
 				}
 
 				dap.configurations.c = dap.configurations.cpp
+				-- 2. New Cortex-Debug / OpenOCD setup
+				local dap_cortex_debug = require("dap-cortex-debug")
+				-- Adapter is found via mason's cortex-debug package; gdb/openocd paths go in the launch config
+				dap_cortex_debug.setup({})
+
+				-- Adds the OpenOCD bare-metal launch profile next to codelldb.
+				-- configurations.c is the same table as configurations.cpp, so this covers both filetypes.
+				table.insert(dap.configurations.cpp, {
+					name = "OpenOCD (ARM Embedded)",
+					type = "cortex-debug",
+					request = "launch",
+					servertype = "openocd",
+					serverpath = "openocd",
+					gdbPath = "arm-none-eabi-gdb",
+					-- Prefills <build>/<cwd name>.elf from ./build or ../build; edit at the prompt if needed
+					executable = function()
+						local cwd = vim.fn.getcwd()
+						local name = vim.fn.fnamemodify(cwd, ":t")
+						local default = cwd .. "/build/"
+						for _, dir in ipairs({ cwd .. "/build", vim.fn.fnamemodify(cwd, ":h") .. "/build" }) do
+							if vim.fn.filereadable(dir .. "/" .. name .. ".elf") == 1 then
+								default = dir .. "/" .. name .. ".elf"
+								break
+							elseif vim.fn.isdirectory(dir) == 1 and default == cwd .. "/build/" then
+								default = dir .. "/"
+							end
+						end
+						return vim.fn.input("Path to ELF binary: ", default, "file")
+					end,
+					-- Resolved at launch time, not at startup
+					cwd = "${workspaceFolder}",
+					interface = "swd",
+					-- Provide the exact config files your board needs
+					searchDir = { "/usr/share/openocd/scripts" },
+					configFiles = {
+						"interface/stlink.cfg", -- e.g., ST-Link debugger interface
+						"target/stm32f4x.cfg", -- e.g., Your target microcontroller
+					},
+					runToEntryPoint = "main",
+					-- Optional: Runs commands inside GDB right after connecting
+					postLaunchCommands = {
+						"monitor reset halt",
+						"load",
+					},
+				})
 			end,
 		},
 
@@ -276,6 +390,33 @@ require("lazy").setup({
 			},
 			config = function()
 				require("dapui").setup()
+
+				-- Label each dap-ui pane with a winbar title
+				local titles = {
+					dapui_scopes = "Scopes / Registers",
+					dapui_breakpoints = "Breakpoints",
+					dapui_stacks = "Call Stack",
+					dapui_watches = "Watches",
+					dapui_console = "Console",
+					["dap-repl"] = "REPL (gdb)",
+				}
+				vim.api.nvim_create_autocmd({ "BufWinEnter", "FileType" }, {
+					pattern = "*",
+					callback = function(args)
+						local title = titles[vim.bo[args.buf].filetype]
+						if not title then
+							return
+						end
+						vim.schedule(function()
+							for _, win in ipairs(vim.fn.win_findbuf(args.buf)) do
+								-- the REPL already has dap-ui's step/continue controls in its winbar; keep them
+								if vim.wo[win].winbar == "" then
+									vim.wo[win].winbar = " " .. title
+								end
+							end
+						end)
+					end,
+				})
 			end,
 		},
 
